@@ -1,0 +1,59 @@
+spring:
+  main:
+    lazy-initialization: true
+  datasource:
+    url: jdbc:h2:mem:dummydb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        search:
+          backend:
+            type: lucene
+            directory:
+              root: ./indexes
+    packages-to-scan: org.ps.dummy.entity
+  cache:
+    type: simple
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    org.ps.dummy: DEBUG
+hibernate:
+  search:
+    backend:
+      type: lucene
+    indexes:
+      base: ./indexes
+resilience4j:
+  circuitbreaker:
+    instances:
+      externalApi:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+  retry:
+    instances:
+      externalApi:
+        maxAttempts: 3
+        waitDuration: 2s
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+app:
+  external:
+    users-url: https://dummyjson.com/users
+server:
+  error:
+    include-message: always
